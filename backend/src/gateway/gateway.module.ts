@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { UsersModule } from '../users/users.module';
 
 import { GatewayService } from './gateway.service';
 import { GatewayAccount } from './entities/gateway-account.entity';
@@ -10,6 +11,7 @@ import { GatewayController } from './gateway.controller';
   imports: [
     HttpModule,
     TypeOrmModule.forFeature([GatewayAccount]),
+    UsersModule,
   ],
   providers: [GatewayService],
   exports: [GatewayService],

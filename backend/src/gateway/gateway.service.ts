@@ -1,10 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
-
 import { RegisterGatewayDto } from './dto/register-gateway.dto';
 import { LoginGatewayDto } from './dto/login-gateway.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { GatewayAccount } from './entities/gateway-account.entity';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class GatewayService {
@@ -13,10 +16,14 @@ export class GatewayService {
   constructor(
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
+    private readonly usersService: UsersService,
+
+    @InjectRepository(GatewayAccount)
+    private readonly gatewayAccountRepository: Repository<GatewayAccount>,
   ) {
     this.baseUrl =
-      this.configService.get<string>('GATEWAY_BASE_URL') ?? '';
-  }
+        this.configService.get<string>('GATEWAY_BASE_URL') ?? '';
+    }
 
   async register(data: RegisterGatewayDto) {
     const response = await firstValueFrom(
@@ -30,13 +37,74 @@ export class GatewayService {
   }
 
   async login(data: LoginGatewayDto) {
-    const response = await firstValueFrom(
-      this.httpService.post(
+    const response = await this.httpService.axiosRef.post(
         `${this.baseUrl}/auth/login`,
         data,
-      ),
     );
 
-    return response.data;
-  }
+    const gatewayData = response.data;
+
+    const user = await this.usersService.findByEmail(
+        gatewayData.user.email,
+    );
+
+    if (!user) {
+        throw new UnauthorizedException(
+        'Usuário não encontrado na aplicação BaaS',
+        );
+    }
+
+    let gatewayAccount =
+        await this.gatewayAccountRepository.findOne({
+        where: {
+            user: {
+            id: user.id,
+            },
+        },
+        relations: {
+            user: true,
+        },
+    });
+
+    if (!gatewayAccount) {
+        gatewayAccount = this.gatewayAccountRepository.create({
+        user,
+        gatewayUserId: String(gatewayData.user.id),
+        document: gatewayData.user.document,
+        codigoCliente: gatewayData.codigoCliente,
+        chaveLoja: gatewayData.chaveLoja,
+        accessToken: gatewayData.access_token,
+        });
+    } else {
+        gatewayAccount.gatewayUserId = String(
+        gatewayData.user.id,
+        );
+
+        gatewayAccount.document =
+        gatewayData.user.document;
+
+        gatewayAccount.codigoCliente =
+        gatewayData.codigoCliente;
+
+        gatewayAccount.chaveLoja =
+        gatewayData.chaveLoja;
+
+        gatewayAccount.accessToken =
+        gatewayData.access_token;
+    }
+
+    await this.gatewayAccountRepository.save(
+        gatewayAccount,
+    );
+
+    return {
+        message: 'Gateway autenticado com sucesso',
+        gatewayConnected: true,
+        user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        },
+    };
+    }
 }

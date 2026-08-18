@@ -23,15 +23,18 @@ export class GatewayAccount {
   user: User;
 
   @Column()
+  gatewayUserId: string;
+
+  @Column()
   document: string;
 
-  @Column({ nullable: true })
-  codigoCliente: string;
+  @Column({ type: 'int' })
+  codigoCliente: number;
 
-  @Column({ nullable: true })
+  @Column()
   chaveLoja: string;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'text' })
   accessToken: string;
 
   @CreateDateColumn()
