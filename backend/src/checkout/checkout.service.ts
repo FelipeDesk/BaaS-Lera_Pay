@@ -10,6 +10,8 @@ import { CheckoutLink } from './entities/checkout-link.entity';
 import { CreateCheckoutDto } from './dto/create-checkout.dto';
 import { UsersService } from '../users/users.service';
 import { GatewayService } from '../gateway/gateway.service';
+import { OrdersService } from '../orders/orders.service';
+import { TransactionsService } from '../transactions/transactions.service';
 
 @Injectable()
 export class CheckoutService {
@@ -20,6 +22,8 @@ export class CheckoutService {
 
     private readonly usersService: UsersService,
     private readonly gatewayService: GatewayService,
+    private readonly ordersService: OrdersService,
+    private readonly transactionsService: TransactionsService,
   ) {}
 
   async create(
@@ -91,6 +95,21 @@ export class CheckoutService {
         String(pixResponse.id);
 
     await this.checkoutRepository.save(checkout);
+
+    await this.ordersService.createFromCheckout(
+      checkout,
+      String(pixResponse.id),
+      pixResponse.status,
+    );
+
+    await this.transactionsService.create({
+      user: checkout.user,
+      gatewayTransactionId: String(pixResponse.id),
+      externalReference: checkout.externalReference,
+      amount: checkout.amount,
+      type: 'PIX',
+      status: pixResponse.status,
+    });
 
     return pixResponse;
   }

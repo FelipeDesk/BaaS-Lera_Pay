@@ -7,6 +7,8 @@ import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { GatewayModule } from './gateway/gateway.module';
 import { CheckoutModule } from './checkout/checkout.module';
+import { OrdersModule } from './orders/orders.module';
+import { TransactionsModule } from './transactions/transactions.module';
 
 @Module({
   imports: [
@@ -31,6 +33,8 @@ import { CheckoutModule } from './checkout/checkout.module';
     UsersModule,
     GatewayModule,
     CheckoutModule,
+    OrdersModule,
+    TransactionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
