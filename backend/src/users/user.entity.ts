@@ -4,7 +4,10 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToOne,
 } from 'typeorm';
+
+import { GatewayAccount } from '../gateway/entities/gateway-account.entity';
 
 @Entity('users')
 export class User {
@@ -19,6 +22,12 @@ export class User {
 
   @Column()
   passwordHash: string;
+
+  @OneToOne(
+    () => GatewayAccount,
+    (gatewayAccount) => gatewayAccount.user,
+  )
+  gatewayAccount: GatewayAccount;
 
   @CreateDateColumn()
   createdAt: Date;
