@@ -2,6 +2,9 @@ import {
   Body,
   Controller,
   Post,
+  Get,
+  Param,
+  ParseIntPipe
 } from '@nestjs/common';
 
 import { GatewayService } from './gateway.service';
@@ -15,16 +18,24 @@ export class GatewayController {
   ) {}
 
   @Post('register')
-  register(
-    @Body() registerGatewayDto: RegisterGatewayDto,
-  ) {
-    return this.gatewayService.register(registerGatewayDto);
-  }
+    register(
+        @Body() registerGatewayDto: RegisterGatewayDto,
+    ) {
+        return this.gatewayService.register(registerGatewayDto);
+    }
 
   @Post('login')
-  login(
-    @Body() loginGatewayDto: LoginGatewayDto,
-  ) {
-    return this.gatewayService.login(loginGatewayDto);
-  }
+    login(
+        @Body() loginGatewayDto: LoginGatewayDto,
+    ) {
+        return this.gatewayService.login(loginGatewayDto);
+    }
+
+  @Get('wallet/:userId')
+    getWallet(
+        @Param('userId', ParseIntPipe) userId: number,
+    ) {
+        return this.gatewayService.getWallet(userId);
+    }
 }
+

@@ -106,5 +106,36 @@ export class GatewayService {
         email: user.email,
         },
     };
+  }
+  
+  async getWallet(userId: number) {
+    const gatewayAccount =
+        await this.gatewayAccountRepository.findOne({
+        where: {
+            user: {
+            id: userId,
+            },
+        },
+        relations: {
+            user: true,
+        },
+        });
+
+    if (!gatewayAccount) {
+        throw new UnauthorizedException(
+        'Conta do gateway não encontrada para este usuário',
+        );
     }
+
+    const response = await this.httpService.axiosRef.get(
+        `${this.baseUrl}/wallet`,
+        {
+        headers: {
+            Authorization: `Bearer ${gatewayAccount.accessToken}`,
+        },
+        },
+    );
+
+    return response.data;
+  }
 }
