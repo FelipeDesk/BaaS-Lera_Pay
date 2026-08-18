@@ -8,6 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { GatewayAccount } from './entities/gateway-account.entity';
 import { UsersService } from '../users/users.service';
+import { CreatePixDto } from './dto/create-pix.dto';
 
 @Injectable()
 export class GatewayService {
@@ -107,7 +108,7 @@ export class GatewayService {
         },
     };
   }
-  
+
   async getWallet(userId: number) {
     const gatewayAccount =
         await this.gatewayAccountRepository.findOne({
@@ -129,6 +130,82 @@ export class GatewayService {
 
     const response = await this.httpService.axiosRef.get(
         `${this.baseUrl}/wallet`,
+        {
+        headers: {
+            Authorization: `Bearer ${gatewayAccount.accessToken}`,
+        },
+        },
+    );
+
+    return response.data;
+  }
+
+  async getTransactions(
+    userId: number,
+    status?: string,
+    type?: string,
+    limit?: number,
+  ) {
+    const gatewayAccount =
+        await this.gatewayAccountRepository.findOne({
+        where: {
+            user: {
+            id: userId,
+            },
+        },
+        relations: {
+            user: true,
+        },
+        });
+
+    if (!gatewayAccount) {
+        throw new UnauthorizedException(
+        'Conta do gateway não encontrada para este usuário',
+        );
+    }
+
+    const response = await this.httpService.axiosRef.get(
+        `${this.baseUrl}/wallet/transactions`,
+        {
+        headers: {
+            Authorization: `Bearer ${gatewayAccount.accessToken}`,
+        },
+        params: {
+            status,
+            type,
+            limit,
+        },
+        },
+    );
+
+    return response.data;
+  }
+
+  async createPix(
+    userId: number,
+    data: CreatePixDto,
+    ) {
+    const gatewayAccount =
+        await this.gatewayAccountRepository.findOne({
+        where: {
+            user: {
+            id: userId,
+            },
+        },
+        relations: {
+            user: true,
+        },
+        });
+
+    if (!gatewayAccount) {
+        throw new UnauthorizedException(
+        'Conta do gateway não encontrada para este usuário',
+        );
+    }
+
+    const response = await this.httpService.axiosRef.post(
+        `${this.baseUrl}/payments/pix`,
+        data,
         {
         headers: {
             Authorization: `Bearer ${gatewayAccount.accessToken}`,
