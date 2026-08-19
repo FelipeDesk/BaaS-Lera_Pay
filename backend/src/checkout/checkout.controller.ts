@@ -8,6 +8,7 @@ import {
 
 import { CheckoutService } from './checkout.service';
 import { CreateCheckoutDto } from './dto/create-checkout.dto';
+import { CreateCardPaymentDto } from '../gateway/dto/create-card-payment.dto';
 
 @Controller('checkout-links')
 export class CheckoutController {
@@ -34,6 +35,23 @@ export class CheckoutController {
     return this.checkoutService.payWithPix(
       checkoutId,
       payerDocument,
+    );
+  }
+
+  @Post(':checkoutId/card')
+  payWithCard(
+    @Param('checkoutId', ParseIntPipe)
+    checkoutId: number,
+
+    @Body()
+    cardData: Omit<
+      CreateCardPaymentDto,
+      'amount' | 'description' | 'externalReference'
+    >,
+  ) {
+    return this.checkoutService.payWithCard(
+      checkoutId,
+      cardData,
     );
   }
 }
