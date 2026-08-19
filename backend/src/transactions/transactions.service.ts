@@ -33,4 +33,25 @@ export class TransactionsService {
       transaction,
     );
   }
+
+  async findByExternalReference(
+    externalReference: string,
+    ) {
+    return this.transactionsRepository.findOne({
+        where: {
+        externalReference,
+        },
+    });
+  }
+
+  async updateStatus(
+    transaction: Transaction,
+    status: Transaction['status'],
+    ) {
+    transaction.status = status;
+
+    return this.transactionsRepository.save(
+        transaction,
+    );
+  }
 }

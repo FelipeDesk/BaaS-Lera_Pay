@@ -113,4 +113,25 @@ export class CheckoutService {
 
     return pixResponse;
   }
+
+  async findByExternalReference(
+    externalReference: string,
+  ) {
+    return this.checkoutRepository.findOne({
+      where: {
+        externalReference,
+      },
+    });
+  }
+
+  async updateStatus(
+    checkout: CheckoutLink,
+    status: CheckoutLink['status'],
+  ) {
+    checkout.status = status;
+
+    return this.checkoutRepository.save(
+      checkout,
+    );
+  }
 }

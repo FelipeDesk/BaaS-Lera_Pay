@@ -9,6 +9,7 @@ import { Repository } from 'typeorm';
 import { GatewayAccount } from './entities/gateway-account.entity';
 import { UsersService } from '../users/users.service';
 import { CreatePixDto } from './dto/create-pix.dto';
+import { CreateWebhookDto } from './dto/create-webhook.dto';
 
 @Injectable()
 export class GatewayService {
@@ -212,6 +213,43 @@ export class GatewayService {
         },
         },
     );
+
+    return response.data;
+  }
+
+  async createWebhook(
+    userId: number,
+    data: CreateWebhookDto,
+    ) {
+    const gatewayAccount =
+        await this.gatewayAccountRepository.findOne({
+        where: {
+            user: {
+            id: userId,
+            },
+        },
+        relations: {
+            user: true,
+        },
+        });
+
+    if (!gatewayAccount) {
+        throw new UnauthorizedException(
+        'Conta do gateway não encontrada para este usuário',
+        );
+    }
+
+    const response =
+        await this.httpService.axiosRef.post(
+        `${this.baseUrl}/webhooks`,
+        data,
+        {
+            headers: {
+            Authorization:
+                `Bearer ${gatewayAccount.accessToken}`,
+            },
+        },
+        );
 
     return response.data;
   }

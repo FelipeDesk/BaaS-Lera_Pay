@@ -9,6 +9,7 @@ import { GatewayModule } from './gateway/gateway.module';
 import { CheckoutModule } from './checkout/checkout.module';
 import { OrdersModule } from './orders/orders.module';
 import { TransactionsModule } from './transactions/transactions.module';
+import { WebhooksModule } from './webhooks/webhooks.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { TransactionsModule } from './transactions/transactions.module';
     CheckoutModule,
     OrdersModule,
     TransactionsModule,
+    WebhooksModule,
   ],
   controllers: [AppController],
   providers: [AppService],

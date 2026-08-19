@@ -12,6 +12,7 @@ import { GatewayService } from './gateway.service';
 import { RegisterGatewayDto } from './dto/register-gateway.dto';
 import { LoginGatewayDto } from './dto/login-gateway.dto';
 import { CreatePixDto } from './dto/create-pix.dto';
+import { CreateWebhookDto } from './dto/create-webhook.dto';
 
 @Controller('gateway')
 export class GatewayController {
@@ -65,5 +66,19 @@ export class GatewayController {
             createPixDto,
         );
   }
+
+  @Post('webhooks/:userId')
+    createWebhook(
+        @Param('userId', ParseIntPipe)
+            userId: number,
+
+        @Body()
+            createWebhookDto: CreateWebhookDto,
+    ) {
+        return this.gatewayService.createWebhook(
+            userId,
+            createWebhookDto,
+    );
+    }
 }
 
