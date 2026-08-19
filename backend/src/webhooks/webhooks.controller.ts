@@ -28,4 +28,17 @@ export class WebhooksController {
       signature,
     );
   }
+
+  @Post('card')
+  handleCard(
+    @Req() req: Request & { rawBody?: Buffer },
+    @Headers('x-lera-box-signature')
+    signature?: string,
+  ) {
+    return this.webhooksService.processCard(
+      req.body,
+      req.rawBody,
+      signature,
+    );
+  }
 }

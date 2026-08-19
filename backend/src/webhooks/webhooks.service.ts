@@ -78,7 +78,8 @@ export class WebhooksService {
     });
   }
 
-  async processPix(
+  private async processPaymentWebhook(
+    expectedEvent: 'PAYMENT_PIX' | 'PAYMENT_CARD',
     payload: any,
     rawBody: Buffer | undefined,
     signature?: string,
@@ -103,7 +104,7 @@ export class WebhooksService {
     } = payload;
 
     if (
-      event !== 'PAYMENT_PIX' ||
+      event !== expectedEvent ||
       !transactionId ||
       !externalReference
     ) {
@@ -194,12 +195,38 @@ export class WebhooksService {
     );
 
     console.log(
-      `Webhook PIX processado: ${externalReference} - ${status}`,
+      `${event} processado: ${externalReference} - ${status}`,
     );
 
     return {
       received: true,
       processed: true,
     };
+  }
+
+  async processPix(
+    payload: any,
+    rawBody: Buffer | undefined,
+    signature?: string,
+  ) {
+    return this.processPaymentWebhook(
+      'PAYMENT_PIX',
+      payload,
+      rawBody,
+      signature,
+    );
+  }
+
+  async processCard(
+    payload: any,
+    rawBody: Buffer | undefined,
+    signature?: string,
+  ) {
+    return this.processPaymentWebhook(
+      'PAYMENT_CARD',
+      payload,
+      rawBody,
+      signature,
+    );
   }
 }
