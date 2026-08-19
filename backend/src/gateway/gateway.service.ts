@@ -10,6 +10,7 @@ import { GatewayAccount } from './entities/gateway-account.entity';
 import { UsersService } from '../users/users.service';
 import { CreatePixDto } from './dto/create-pix.dto';
 import { CreateWebhookDto } from './dto/create-webhook.dto';
+import { CreateCardPaymentDto } from './dto/create-card-payment.dto';
 
 @Injectable()
 export class GatewayService {
@@ -243,6 +244,119 @@ export class GatewayService {
         await this.httpService.axiosRef.post(
         `${this.baseUrl}/webhooks`,
         data,
+        {
+            headers: {
+            Authorization:
+                `Bearer ${gatewayAccount.accessToken}`,
+            },
+        },
+        );
+
+    return response.data;
+  }
+
+  async getFees(brand?: string) {
+    const response = await this.httpService.axiosRef.get(
+        `${this.baseUrl}/fees`,
+        {
+        params: {
+            brand,
+        },
+        },
+    );
+
+    return response.data;
+  }
+
+  private detectCardBrand(
+    cardNumber: string,
+    ): 'VISA' | 'MASTERCARD' | 'ELO' {
+    const number = cardNumber.replace(/\D/g, '');
+
+    if (number.startsWith('4')) {
+        return 'VISA';
+    }
+
+    const firstTwo = Number(number.slice(0, 2));
+
+    if (firstTwo >= 51 && firstTwo <= 55) {
+        return 'MASTERCARD';
+    }
+
+    return 'ELO';
+  }
+
+  private async getFeeForInstallments(
+    brand: 'VISA' | 'MASTERCARD' | 'ELO',
+    installments: number,
+    ) {
+    const feesResponse =
+        await this.getFees(brand);
+
+    const fee = feesResponse.fees.find(
+        (item: any) =>
+        item.installments === installments,
+    );
+
+    if (!fee) {
+        throw new Error(
+        'Taxa não encontrada para essa bandeira e quantidade de parcelas',
+        );
+    }
+
+    return fee;
+  }
+
+  async createCardPayment(
+    userId: number,
+    data: CreateCardPaymentDto,
+    ) {
+    const gatewayAccount =
+        await this.gatewayAccountRepository.findOne({
+        where: {
+            user: {
+            id: userId,
+            },
+        },
+        relations: {
+            user: true,
+        },
+        });
+
+    if (!gatewayAccount) {
+        throw new UnauthorizedException(
+        'Conta do gateway não encontrada para este usuário',
+        );
+    }
+
+    const brand =
+        this.detectCardBrand(data.cardNumber);
+
+    const fee =
+        await this.getFeeForInstallments(
+        brand,
+        data.installments,
+        );
+
+    const response =
+        await this.httpService.axiosRef.post(
+        `${this.baseUrl}/payments/card`,
+        {
+            amount: data.amount,
+            description: data.description,
+            externalReference:
+            data.externalReference,
+
+            cardNumber: data.cardNumber,
+            cardHolder: data.cardHolder,
+            expiryMonth: data.expiryMonth,
+            expiryYear: data.expiryYear,
+            cvv: data.cvv,
+
+            installments: data.installments,
+
+            feePercent: fee.feePercent,
+        },
         {
             headers: {
             Authorization:

@@ -13,6 +13,7 @@ import { RegisterGatewayDto } from './dto/register-gateway.dto';
 import { LoginGatewayDto } from './dto/login-gateway.dto';
 import { CreatePixDto } from './dto/create-pix.dto';
 import { CreateWebhookDto } from './dto/create-webhook.dto';
+import { CreateCardPaymentDto } from './dto/create-card-payment.dto';
 
 @Controller('gateway')
 export class GatewayController {
@@ -79,6 +80,28 @@ export class GatewayController {
             userId,
             createWebhookDto,
     );
+  }
+
+  @Get('fees')
+    getFees(
+        @Query('brand') brand?: string,
+    ) {
+        return this.gatewayService.getFees(brand);
+  }
+
+  @Post('card/:userId')
+    createCardPayment(
+        @Param('userId', ParseIntPipe)
+            userId: number,
+
+        @Body()
+            createCardPaymentDto:
+            CreateCardPaymentDto,
+    ) {
+        return this.gatewayService.createCardPayment(
+            userId,
+            createCardPaymentDto,
+        );
     }
 }
 
