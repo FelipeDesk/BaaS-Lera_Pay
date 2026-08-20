@@ -1,10 +1,8 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import api from '../services/api';
 
 function Withdrawals() {
-  const navigate = useNavigate();
 
   const [amount, setAmount] = useState('');
   const [pixKey, setPixKey] = useState('');
@@ -45,14 +43,17 @@ function Withdrawals() {
   }
 
   return (
-    <div>
+    <div className="page">
+      <div className="page-header">
       <h1>Solicitar saque</h1>
+      </div>
 
-      <form onSubmit={handleSubmit}>
-        <div>
+      <form className="card form-card" onSubmit={handleSubmit}>
+        <div className="form-group">
           <label>Valor em centavos</label>
 
           <input
+            className="input"
             type="number"
             min="1"
             value={amount}
@@ -64,10 +65,11 @@ function Withdrawals() {
           />
         </div>
 
-        <div>
+        <div className="form-group">
           <label>Chave PIX</label>
 
           <input
+            className="input"
             type="text"
             value={pixKey}
             onChange={(event) =>
@@ -78,10 +80,11 @@ function Withdrawals() {
           />
         </div>
 
-        <div>
+        <div className="form-group">
           <label>Documento</label>
 
           <input
+            className="input"
             type="text"
             value={document}
             onChange={(event) =>
@@ -92,10 +95,11 @@ function Withdrawals() {
           />
         </div>
 
-        <div>
+        <div className="form-group">
           <label>Descrição</label>
 
           <input
+            className="input"
             type="text"
             value={description}
             onChange={(event) =>
@@ -109,14 +113,15 @@ function Withdrawals() {
         </div>
 
         {error && (
-          <p>
+          <div className="error-message">
             {Array.isArray(error)
               ? error.join(', ')
               : error}
-          </p>
+          </div>
         )}
 
         <button
+          className="button button-primary"
           type="submit"
           disabled={loading}
         >
@@ -127,12 +132,22 @@ function Withdrawals() {
       </form>
 
       {result && (
-        <div>
+        <div className="card form-card">
           <h2>Resultado do saque</h2>
 
           <p>
             <strong>Status:</strong>{' '}
-            {result.status}
+            <span
+              className={`status status-${
+                result.status === 'APPROVED'
+                  ? 'approved'
+                  : result.status === 'PENDING'
+                    ? 'pending'
+                    : 'denied'
+              }`}
+            >
+              {result.status}
+            </span>
           </p>
 
           <p>
@@ -171,14 +186,6 @@ function Withdrawals() {
           )}
         </div>
       )}
-
-      <button
-        onClick={() =>
-          navigate('/dashboard')
-        }
-      >
-        Voltar ao dashboard
-      </button>
     </div>
   );
 }

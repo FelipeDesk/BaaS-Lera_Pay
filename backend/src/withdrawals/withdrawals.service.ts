@@ -91,4 +91,64 @@ export class WithdrawalsService {
       withdrawal,
     );
   }
+
+  async getStatus(
+    userId: number,
+    withdrawalId: number,
+  ) {
+    const withdrawal =
+      await this.withdrawalsRepository.findOne({
+        where: {
+          id: withdrawalId,
+        },
+        relations: {
+          user: true,
+        },
+      });
+
+    if (!withdrawal) {
+      throw new NotFoundException(
+        'Saque não encontrado',
+      );
+    }
+
+    if (withdrawal.user.id !== userId) {
+      throw new NotFoundException(
+        'Saque não encontrado',
+      );
+    }
+
+    if (!withdrawal.gatewayWithdrawalId) {
+      return withdrawal;
+    }
+
+    const gatewayResponse =
+      await this.gatewayService.getWithdrawal(
+        userId,
+        withdrawal.gatewayWithdrawalId,
+      );
+
+    if (gatewayResponse.status) {
+      withdrawal.status =
+        gatewayResponse.status;
+
+      await this.withdrawalsRepository.save(
+        withdrawal,
+      );
+    }
+
+    return {
+      id: withdrawal.id,
+      externalReference:
+        withdrawal.externalReference,
+      gatewayWithdrawalId:
+        withdrawal.gatewayWithdrawalId,
+      amount: withdrawal.amount,
+      pixKey: withdrawal.pixKey,
+      document: withdrawal.document,
+      description: withdrawal.description,
+      status: withdrawal.status,
+      gateway: gatewayResponse,
+    };
+  }
 }

@@ -1,14 +1,10 @@
 import { useState } from 'react';
-import {
-  useNavigate,
-  useParams,
-} from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 import api from '../services/api';
 
 function PixPayment() {
   const { checkoutId } = useParams();
-  const navigate = useNavigate();
 
   const [payerDocument, setPayerDocument] =
     useState('');
@@ -48,19 +44,22 @@ function PixPayment() {
   }
 
   return (
-    <div>
+    <div className="page">
+      <div className="page-header">
       <h1>Pagamento PIX</h1>
 
       <p>
         Checkout #{checkoutId}
       </p>
+      </div>
 
       {!payment && (
-        <form onSubmit={handleSubmit}>
-          <div>
+        <form className="card form-card" onSubmit={handleSubmit}>
+          <div className="form-group">
             <label>CPF/CNPJ do pagador</label>
 
             <input
+              className="input"
               type="text"
               value={payerDocument}
               onChange={(event) =>
@@ -73,9 +72,10 @@ function PixPayment() {
             />
           </div>
 
-          {error && <p>{error}</p>}
+          {error && <div className="error-message">{error}</div>}
 
           <button
+            className="button button-primary"
             type="submit"
             disabled={loading}
           >
@@ -87,9 +87,20 @@ function PixPayment() {
       )}
 
       {payment && (
-        <div>
+        <div className="card form-card">
           <h2>
-            Status: {payment.status}
+            Status:{' '}
+            <span
+              className={`status status-${
+                payment.status === 'APPROVED'
+                  ? 'approved'
+                  : payment.status === 'PENDING'
+                    ? 'pending'
+                    : 'denied'
+              }`}
+            >
+              {payment.status}
+            </span>
           </h2>
 
           <p>
@@ -107,6 +118,7 @@ function PixPayment() {
               <h3>PIX Copia e Cola</h3>
 
               <textarea
+                className="input"
                 value={payment.copyPaste}
                 readOnly
                 rows="6"
@@ -133,14 +145,6 @@ function PixPayment() {
           )}
         </div>
       )}
-
-      <button
-        onClick={() =>
-          navigate('/dashboard')
-        }
-      >
-        Voltar ao dashboard
-      </button>
     </div>
   );
 }

@@ -1,14 +1,10 @@
 import { useEffect, useState } from 'react';
-import {
-  useNavigate,
-  useParams,
-} from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 import api from '../services/api';
 
 function CardPayment() {
   const { checkoutId } = useParams();
-  const navigate = useNavigate();
 
   const [cardNumber, setCardNumber] =
     useState('');
@@ -60,7 +56,7 @@ function CardPayment() {
       } catch (error) {
         setError(
           error.response?.data?.message ||
-            'Erro ao carregar taxas',
+          'Erro ao carregar taxas',
         );
       } finally {
         setLoadingFees(false);
@@ -102,7 +98,7 @@ function CardPayment() {
     } catch (error) {
       setError(
         error.response?.data?.message ||
-          'Erro ao processar pagamento',
+        'Erro ao processar pagamento',
       );
     } finally {
       setLoadingPayment(false);
@@ -110,21 +106,24 @@ function CardPayment() {
   }
 
   return (
-    <div>
-      <h1>Pagamento com cartão</h1>
+    <div className="page">
+      <div className="page-header">
+        <h1>Pagamento com cartão</h1>
 
-      <p>
-        Checkout #{checkoutId}
-      </p>
+        <p>
+          Checkout #{checkoutId}
+        </p>
+      </div>
 
       {!payment && (
-        <form onSubmit={handleSubmit}>
-          <div>
+        <form className="card form-card" onSubmit={handleSubmit}>
+          <div className="form-group">
             <label>
               Número do cartão
             </label>
 
             <input
+              className="input"
               type="text"
               value={cardNumber}
               onChange={(event) =>
@@ -137,12 +136,13 @@ function CardPayment() {
             />
           </div>
 
-          <div>
+          <div className="form-group">
             <label>
               Nome no cartão
             </label>
 
             <input
+              className="input"
               type="text"
               value={cardHolder}
               onChange={(event) =>
@@ -155,10 +155,11 @@ function CardPayment() {
             />
           </div>
 
-          <div>
+          <div className="form-group">
             <label>Mês</label>
 
             <input
+              className="input"
               type="text"
               value={expiryMonth}
               onChange={(event) =>
@@ -172,10 +173,11 @@ function CardPayment() {
             />
           </div>
 
-          <div>
+          <div className="form-group">
             <label>Ano</label>
 
             <input
+              className="input"
               type="text"
               value={expiryYear}
               onChange={(event) =>
@@ -189,10 +191,11 @@ function CardPayment() {
             />
           </div>
 
-          <div>
+          <div className="form-group">
             <label>CVV</label>
 
             <input
+              className="input"
               type="password"
               value={cvv}
               onChange={(event) =>
@@ -204,7 +207,7 @@ function CardPayment() {
             />
           </div>
 
-          <div>
+          <div className="form-group">
             <label>Parcelas</label>
 
             {loadingFees ? (
@@ -213,6 +216,7 @@ function CardPayment() {
               </p>
             ) : (
               <select
+                className="input"
                 value={installments}
                 onChange={(event) =>
                   setInstallments(
@@ -246,9 +250,10 @@ function CardPayment() {
             </p>
           )}
 
-          {error && <p>{error}</p>}
+          {error && <div className="error-message">{error}</div>}
 
           <button
+            className="button button-primary"
             type="submit"
             disabled={
               loadingPayment ||
@@ -263,9 +268,19 @@ function CardPayment() {
       )}
 
       {payment && (
-        <div>
+        <div className="card form-card">
           <h2>
-            Status: {payment.status}
+            Status:{' '}
+            <span
+              className={`status status-${payment.status === 'APPROVED'
+                ? 'approved'
+                : payment.status === 'PENDING'
+                  ? 'pending'
+                  : 'denied'
+                }`}
+            >
+              {payment.status}
+            </span>
           </h2>
 
           <p>
@@ -317,14 +332,6 @@ function CardPayment() {
           )}
         </div>
       )}
-
-      <button
-        onClick={() =>
-          navigate('/dashboard')
-        }
-      >
-        Voltar ao dashboard
-      </button>
     </div>
   );
 }

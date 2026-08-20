@@ -11,14 +11,22 @@ import Checkout from './pages/Checkout';
 import PixPayment from './pages/PixPayment';
 import CardPayment from './pages/CardPayment';
 import Withdrawals from './pages/Withdrawals';
+import Webhooks from './pages/Webhooks';
+
 import ProtectedRoute from './components/ProtectedRoute';
+import AppLayout from './components/AppLayout';
 
 function App() {
   return (
     <Routes>
       <Route
         path="/"
-        element={<Navigate to="/login" />}
+        element={
+          <Navigate
+            to="/dashboard"
+            replace
+          />
+        }
       />
 
       <Route
@@ -27,58 +35,47 @@ function App() {
       />
 
       <Route
-        path="/dashboard"
         element={
           <ProtectedRoute>
-            <Dashboard />
+            <AppLayout />
           </ProtectedRoute>
         }
-      />
+      >
+        <Route
+          path="/dashboard"
+          element={<Dashboard />}
+        />
 
-      <Route
-        path="/transactions"
-        element={
-          <ProtectedRoute>
-            <Transactions />
-          </ProtectedRoute>
-        }
-      />
+        <Route
+          path="/transactions"
+          element={<Transactions />}
+        />
 
-      <Route
-        path="/checkout"
-        element={
-          <ProtectedRoute>
-            <Checkout />
-          </ProtectedRoute>
-        }
-      />
+        <Route
+          path="/checkout"
+          element={<Checkout />}
+        />
 
-      <Route
-        path="/checkout/:checkoutId/pix"
-        element={
-          <ProtectedRoute>
-            <PixPayment />
-          </ProtectedRoute>
-        }
-      />
+        <Route
+          path="/checkout/:checkoutId/pix"
+          element={<PixPayment />}
+        />
 
-      <Route
-        path="/checkout/:checkoutId/card"
-        element={
-          <ProtectedRoute>
-            <CardPayment />
-          </ProtectedRoute>
-        }
-      />
+        <Route
+          path="/checkout/:checkoutId/card"
+          element={<CardPayment />}
+        />
 
-      <Route
-        path="/withdrawals"
-        element={
-          <ProtectedRoute>
-            <Withdrawals />
-          </ProtectedRoute>
-        }
-      />
+        <Route
+          path="/withdrawals"
+          element={<Withdrawals />}
+        />
+
+        <Route
+          path="/webhooks"
+          element={<Webhooks />}
+        />
+      </Route>
     </Routes>
   );
 }

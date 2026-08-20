@@ -7,7 +7,7 @@ import {
   OneToOne,
 } from 'typeorm';
 
-import { GatewayAccount } from '../gateway/entities/gateway-account.entity';
+import { GatewayAccount } from '../../gateway/entities/gateway-account.entity';
 
 @Entity('users')
 export class User {

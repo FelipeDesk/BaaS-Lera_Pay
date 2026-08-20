@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import api from '../services/api';
 
 function Checkout() {
@@ -40,7 +41,7 @@ function Checkout() {
     } catch (error) {
       setError(
         error.response?.data?.message ||
-          'Erro ao criar checkout',
+        'Erro ao criar checkout',
       );
     } finally {
       setLoading(false);
@@ -48,14 +49,17 @@ function Checkout() {
   }
 
   return (
-    <div>
-      <h1>Criar cobrança</h1>
+    <div className="page">
+      <div className="page-header">
+        <h1>Criar cobrança</h1>
+      </div>
 
-      <form onSubmit={handleSubmit}>
-        <div>
+      <form className="card form-card" onSubmit={handleSubmit}>
+        <div className="form-group">
           <label>Valor em centavos</label>
 
           <input
+            className="input"
             type="number"
             min="1"
             value={amount}
@@ -67,10 +71,11 @@ function Checkout() {
           />
         </div>
 
-        <div>
+        <div className="form-group">
           <label>Descrição</label>
 
           <input
+            className="input"
             type="text"
             value={description}
             onChange={(event) =>
@@ -81,10 +86,11 @@ function Checkout() {
           />
         </div>
 
-        <div>
+        <div className="form-group">
           <label>Forma de pagamento</label>
 
           <select
+            className="input"
             value={paymentMethod}
             onChange={(event) =>
               setPaymentMethod(event.target.value)
@@ -100,9 +106,10 @@ function Checkout() {
           </select>
         </div>
 
-        {error && <p>{error}</p>}
+        {error && <div className="error-message">{error}</div>}
 
         <button
+          className="button button-primary"
           type="submit"
           disabled={loading}
         >
@@ -111,14 +118,6 @@ function Checkout() {
             : 'Criar checkout'}
         </button>
       </form>
-
-      <button
-        onClick={() =>
-          navigate('/dashboard')
-        }
-      >
-        Voltar
-      </button>
     </div>
   );
 }

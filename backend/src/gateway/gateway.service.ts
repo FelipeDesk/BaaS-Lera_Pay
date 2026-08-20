@@ -25,8 +25,8 @@ export class GatewayService {
     private readonly gatewayAccountRepository: Repository<GatewayAccount>,
   ) {
     this.baseUrl =
-        this.configService.get<string>('GATEWAY_BASE_URL') ?? '';
-    }
+      this.configService.get<string>('GATEWAY_BASE_URL') ?? '';
+  }
 
   async register(data: RegisterGatewayDto) {
     const response = await firstValueFrom(
@@ -41,102 +41,102 @@ export class GatewayService {
 
   async login(data: LoginGatewayDto) {
     const response = await this.httpService.axiosRef.post(
-        `${this.baseUrl}/auth/login`,
-        data,
+      `${this.baseUrl}/auth/login`,
+      data,
     );
 
     const gatewayData = response.data;
 
     const user = await this.usersService.findByEmail(
-        gatewayData.user.email,
+      gatewayData.user.email,
     );
 
     if (!user) {
-        throw new UnauthorizedException(
+      throw new UnauthorizedException(
         'Usuário não encontrado na aplicação BaaS',
-        );
+      );
     }
 
     let gatewayAccount =
-        await this.gatewayAccountRepository.findOne({
+      await this.gatewayAccountRepository.findOne({
         where: {
-            user: {
+          user: {
             id: user.id,
-            },
+          },
         },
         relations: {
-            user: true,
+          user: true,
         },
-    });
+      });
 
     if (!gatewayAccount) {
-        gatewayAccount = this.gatewayAccountRepository.create({
+      gatewayAccount = this.gatewayAccountRepository.create({
         user,
         gatewayUserId: String(gatewayData.user.id),
         document: gatewayData.user.document,
         codigoCliente: gatewayData.codigoCliente,
         chaveLoja: gatewayData.chaveLoja,
         accessToken: gatewayData.access_token,
-        });
+      });
     } else {
-        gatewayAccount.gatewayUserId = String(
+      gatewayAccount.gatewayUserId = String(
         gatewayData.user.id,
-        );
+      );
 
-        gatewayAccount.document =
+      gatewayAccount.document =
         gatewayData.user.document;
 
-        gatewayAccount.codigoCliente =
+      gatewayAccount.codigoCliente =
         gatewayData.codigoCliente;
 
-        gatewayAccount.chaveLoja =
+      gatewayAccount.chaveLoja =
         gatewayData.chaveLoja;
 
-        gatewayAccount.accessToken =
+      gatewayAccount.accessToken =
         gatewayData.access_token;
     }
 
     await this.gatewayAccountRepository.save(
-        gatewayAccount,
+      gatewayAccount,
     );
 
     return {
-        message: 'Gateway autenticado com sucesso',
-        gatewayConnected: true,
-        user: {
+      message: 'Gateway autenticado com sucesso',
+      gatewayConnected: true,
+      user: {
         id: user.id,
         name: user.name,
         email: user.email,
-        },
+      },
     };
   }
 
   async getWallet(userId: number) {
     const gatewayAccount =
-        await this.gatewayAccountRepository.findOne({
+      await this.gatewayAccountRepository.findOne({
         where: {
-            user: {
+          user: {
             id: userId,
-            },
+          },
         },
         relations: {
-            user: true,
+          user: true,
         },
-        });
+      });
 
     if (!gatewayAccount) {
-        throw new UnauthorizedException(
+      throw new UnauthorizedException(
         'Conta do gateway não encontrada para este usuário',
-        );
+      );
     }
 
     const response = await this.httpService.axiosRef.get(
-        `${this.baseUrl}/wallet`,
-        {
+      `${this.baseUrl}/wallet`,
+      {
         headers: {
-            Authorization: `Bearer ${gatewayAccount.accessToken}`,
+          Authorization: `Bearer ${gatewayAccount.accessToken}`,
         },
-        },
+      },
     );
 
     return response.data;
@@ -149,35 +149,35 @@ export class GatewayService {
     limit?: number,
   ) {
     const gatewayAccount =
-        await this.gatewayAccountRepository.findOne({
+      await this.gatewayAccountRepository.findOne({
         where: {
-            user: {
+          user: {
             id: userId,
-            },
+          },
         },
         relations: {
-            user: true,
+          user: true,
         },
-        });
+      });
 
     if (!gatewayAccount) {
-        throw new UnauthorizedException(
+      throw new UnauthorizedException(
         'Conta do gateway não encontrada para este usuário',
-        );
+      );
     }
 
     const response = await this.httpService.axiosRef.get(
-        `${this.baseUrl}/wallet/transactions`,
-        {
+      `${this.baseUrl}/wallet/transactions`,
+      {
         headers: {
-            Authorization: `Bearer ${gatewayAccount.accessToken}`,
+          Authorization: `Bearer ${gatewayAccount.accessToken}`,
         },
         params: {
-            status,
-            type,
-            limit,
+          status,
+          type,
+          limit,
         },
-        },
+      },
     );
 
     return response.data;
@@ -186,33 +186,33 @@ export class GatewayService {
   async createPix(
     userId: number,
     data: CreatePixDto,
-    ) {
+  ) {
     const gatewayAccount =
-        await this.gatewayAccountRepository.findOne({
+      await this.gatewayAccountRepository.findOne({
         where: {
-            user: {
+          user: {
             id: userId,
-            },
+          },
         },
         relations: {
-            user: true,
+          user: true,
         },
-        });
+      });
 
     if (!gatewayAccount) {
-        throw new UnauthorizedException(
+      throw new UnauthorizedException(
         'Conta do gateway não encontrada para este usuário',
-        );
+      );
     }
 
     const response = await this.httpService.axiosRef.post(
-        `${this.baseUrl}/payments/pix`,
-        data,
-        {
+      `${this.baseUrl}/payments/pix`,
+      data,
+      {
         headers: {
-            Authorization: `Bearer ${gatewayAccount.accessToken}`,
+          Authorization: `Bearer ${gatewayAccount.accessToken}`,
         },
-        },
+      },
     );
 
     return response.data;
@@ -221,48 +221,48 @@ export class GatewayService {
   async createWebhook(
     userId: number,
     data: CreateWebhookDto,
-    ) {
+  ) {
     const gatewayAccount =
-        await this.gatewayAccountRepository.findOne({
+      await this.gatewayAccountRepository.findOne({
         where: {
-            user: {
+          user: {
             id: userId,
-            },
+          },
         },
         relations: {
-            user: true,
+          user: true,
         },
-        });
+      });
 
     if (!gatewayAccount) {
-        throw new UnauthorizedException(
+      throw new UnauthorizedException(
         'Conta do gateway não encontrada para este usuário',
-        );
+      );
     }
 
     const response =
-        await this.httpService.axiosRef.post(
+      await this.httpService.axiosRef.post(
         `${this.baseUrl}/webhooks`,
         data,
         {
-            headers: {
+          headers: {
             Authorization:
-                `Bearer ${gatewayAccount.accessToken}`,
-            },
+              `Bearer ${gatewayAccount.accessToken}`,
+          },
         },
-        );
+      );
 
     return response.data;
   }
 
   async getFees(brand?: string) {
     const response = await this.httpService.axiosRef.get(
-        `${this.baseUrl}/fees`,
-        {
+      `${this.baseUrl}/fees`,
+      {
         params: {
-            brand,
+          brand,
         },
-        },
+      },
     );
 
     return response.data;
@@ -270,17 +270,17 @@ export class GatewayService {
 
   private detectCardBrand(
     cardNumber: string,
-    ): 'VISA' | 'MASTERCARD' | 'ELO' {
+  ): 'VISA' | 'MASTERCARD' | 'ELO' {
     const number = cardNumber.replace(/\D/g, '');
 
     if (number.startsWith('4')) {
-        return 'VISA';
+      return 'VISA';
     }
 
     const firstTwo = Number(number.slice(0, 2));
 
     if (firstTwo >= 51 && firstTwo <= 55) {
-        return 'MASTERCARD';
+      return 'MASTERCARD';
     }
 
     return 'ELO';
@@ -289,19 +289,19 @@ export class GatewayService {
   private async getFeeForInstallments(
     brand: 'VISA' | 'MASTERCARD' | 'ELO',
     installments: number,
-    ) {
+  ) {
     const feesResponse =
-        await this.getFees(brand);
+      await this.getFees(brand);
 
     const fee = feesResponse.fees.find(
-        (item: any) =>
+      (item: any) =>
         item.installments === installments,
     );
 
     if (!fee) {
-        throw new Error(
+      throw new Error(
         'Taxa não encontrada para essa bandeira e quantidade de parcelas',
-        );
+      );
     }
 
     return fee;
@@ -310,60 +310,60 @@ export class GatewayService {
   async createCardPayment(
     userId: number,
     data: CreateCardPaymentDto,
-    ) {
+  ) {
     const gatewayAccount =
-        await this.gatewayAccountRepository.findOne({
+      await this.gatewayAccountRepository.findOne({
         where: {
-            user: {
+          user: {
             id: userId,
-            },
+          },
         },
         relations: {
-            user: true,
+          user: true,
         },
-        });
+      });
 
     if (!gatewayAccount) {
-        throw new UnauthorizedException(
+      throw new UnauthorizedException(
         'Conta do gateway não encontrada para este usuário',
-        );
+      );
     }
 
     const brand =
-        this.detectCardBrand(data.cardNumber);
+      this.detectCardBrand(data.cardNumber);
 
     const fee =
-        await this.getFeeForInstallments(
+      await this.getFeeForInstallments(
         brand,
         data.installments,
-        );
+      );
 
     const response =
-        await this.httpService.axiosRef.post(
+      await this.httpService.axiosRef.post(
         `${this.baseUrl}/payments/card`,
         {
-            amount: data.amount,
-            description: data.description,
-            externalReference:
+          amount: data.amount,
+          description: data.description,
+          externalReference:
             data.externalReference,
 
-            cardNumber: data.cardNumber,
-            cardHolder: data.cardHolder,
-            expiryMonth: data.expiryMonth,
-            expiryYear: data.expiryYear,
-            cvv: data.cvv,
+          cardNumber: data.cardNumber,
+          cardHolder: data.cardHolder,
+          expiryMonth: data.expiryMonth,
+          expiryYear: data.expiryYear,
+          cvv: data.cvv,
 
-            installments: data.installments,
+          installments: data.installments,
 
-            feePercent: fee.feePercent,
+          feePercent: fee.feePercent,
         },
         {
-            headers: {
+          headers: {
             Authorization:
-                `Bearer ${gatewayAccount.accessToken}`,
-            },
+              `Bearer ${gatewayAccount.accessToken}`,
+          },
         },
-        );
+      );
 
     return response.data;
   }
@@ -371,42 +371,42 @@ export class GatewayService {
   async createWithdrawal(
     userId: number,
     data: {
-        amount: number;
-        pixKey: string;
-        description: string;
-        externalReference: string;
-        document: string;
+      amount: number;
+      pixKey: string;
+      description: string;
+      externalReference: string;
+      document: string;
     },
-    ) {
+  ) {
     const gatewayAccount =
-        await this.gatewayAccountRepository.findOne({
+      await this.gatewayAccountRepository.findOne({
         where: {
-            user: {
+          user: {
             id: userId,
-            },
+          },
         },
         relations: {
-            user: true,
+          user: true,
         },
-        });
+      });
 
     if (!gatewayAccount) {
-        throw new UnauthorizedException(
+      throw new UnauthorizedException(
         'Conta do gateway não encontrada para este usuário',
-        );
+      );
     }
 
     const response =
-        await this.httpService.axiosRef.post(
+      await this.httpService.axiosRef.post(
         `${this.baseUrl}/withdrawals`,
         data,
         {
-            headers: {
+          headers: {
             Authorization:
-                `Bearer ${gatewayAccount.accessToken}`,
-            },
+              `Bearer ${gatewayAccount.accessToken}`,
+          },
         },
-        );
+      );
 
     return response.data;
   }
@@ -414,32 +414,32 @@ export class GatewayService {
   async getWithdrawal(
     userId: number,
     withdrawalId: string,
-    ) {
+  ) {
     const gatewayAccount =
-        await this.gatewayAccountRepository.findOne({
+      await this.gatewayAccountRepository.findOne({
         where: {
-            user: {
+          user: {
             id: userId,
-            },
+          },
         },
-        });
+      });
 
     if (!gatewayAccount) {
-        throw new UnauthorizedException(
+      throw new UnauthorizedException(
         'Conta do gateway não encontrada',
-        );
+      );
     }
 
     const response =
-        await this.httpService.axiosRef.get(
+      await this.httpService.axiosRef.get(
         `${this.baseUrl}/withdrawals/${withdrawalId}`,
         {
-            headers: {
+          headers: {
             Authorization:
-                `Bearer ${gatewayAccount.accessToken}`,
-            },
+              `Bearer ${gatewayAccount.accessToken}`,
+          },
         },
-        );
+      );
 
     return response.data;
   }

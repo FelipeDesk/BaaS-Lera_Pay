@@ -59,14 +59,17 @@ function Transactions() {
   }
 
   return (
-    <div>
+    <div className="page">
+      <div className="page-header">
       <h1>Transações</h1>
+      </div>
 
-      <form onSubmit={handleFilter}>
-        <div>
+      <form className="card form-card" onSubmit={handleFilter}>
+        <div className="form-group">
           <label>Status</label>
 
           <select
+            className="input"
             value={status}
             onChange={(event) =>
               setStatus(event.target.value)
@@ -98,10 +101,11 @@ function Transactions() {
           </select>
         </div>
 
-        <div>
+        <div className="form-group">
           <label>Tipo</label>
 
           <select
+            className="input"
             value={type}
             onChange={(event) =>
               setType(event.target.value)
@@ -125,10 +129,11 @@ function Transactions() {
           </select>
         </div>
 
-        <div>
+        <div className="form-group">
           <label>Limite</label>
 
           <select
+            className="input"
             value={limit}
             onChange={(event) =>
               setLimit(event.target.value)
@@ -140,26 +145,25 @@ function Transactions() {
           </select>
         </div>
 
-        <button type="submit">
+        <button className="button button-primary" type="submit">
           Filtrar
         </button>
       </form>
 
-      {error && <p>{error}</p>}
+      {error && <div className="error-message">{error}</div>}
 
       {loading ? (
         <p>Carregando...</p>
       ) : (
-        <div>
+        <div className="cards-grid">
           {transactions.length === 0 ? (
-            <p>
+            <div className="card">
               Nenhuma transação encontrada.
-            </p>
+            </div>
           ) : (
             transactions.map(
               (transaction) => (
-                <div key={transaction.id}>
-                  <hr />
+                <div className="card" key={transaction.id}>
 
                   <p>
                     <strong>Tipo:</strong>{' '}
@@ -168,7 +172,17 @@ function Transactions() {
 
                   <p>
                     <strong>Status:</strong>{' '}
-                    {transaction.status}
+                    <span
+                      className={`status status-${
+                        transaction.status === 'APPROVED'
+                          ? 'approved'
+                          : transaction.status === 'PENDING'
+                            ? 'pending'
+                            : 'denied'
+                      }`}
+                    >
+                      {transaction.status}
+                    </span>
                   </p>
 
                   <p>
