@@ -2,8 +2,6 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { GatewayModule } from './gateway/gateway.module';
 import { CheckoutModule } from './checkout/checkout.module';
@@ -42,9 +40,7 @@ import { CorrelationIdMiddleware } from './common/middleware/correlation-id.midd
     WebhooksModule,
     WithdrawalsModule,
     AuthModule,
-  ],
-  controllers: [AppController],
-  providers: [AppService],
+  ]
 })
 export class AppModule
   implements NestModule

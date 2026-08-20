@@ -60,6 +60,7 @@ export class CheckoutService {
 
   async payWithPix(
     checkoutId: number,
+    userId: number,
     payerDocument: string,
     ) {
     const checkout =
@@ -73,14 +74,20 @@ export class CheckoutService {
         });
 
     if (!checkout) {
-        throw new NotFoundException(
+      throw new NotFoundException(
         'Checkout não encontrado',
-        );
+      );
+    }
+
+    if (checkout.user.id !== userId) {
+      throw new NotFoundException(
+        'Checkout não encontrado',
+      );
     }
 
     const pixResponse =
         await this.gatewayService.createPix(
-        checkout.user.id,
+        userId,
         {
             amount: checkout.amount,
             description: checkout.description,
@@ -138,6 +145,7 @@ export class CheckoutService {
 
   async payWithCard(
     checkoutId: number,
+    userId: number,
     cardData: Omit<
       CreateCardPaymentDto,
       'amount' | 'description' | 'externalReference'
@@ -159,6 +167,12 @@ export class CheckoutService {
       );
     }
 
+    if (checkout.user.id !== userId) {
+      throw new NotFoundException(
+        'Checkout não encontrado',
+      );
+    }
+
     if (checkout.paymentMethod !== 'CREDIT_CARD') {
       throw new NotFoundException(
         'Este checkout não foi criado para pagamento com cartão',
@@ -167,7 +181,7 @@ export class CheckoutService {
 
     const cardResponse =
       await this.gatewayService.createCardPayment(
-        checkout.user.id,
+        userId,
         {
           amount: checkout.amount,
           description: checkout.description,

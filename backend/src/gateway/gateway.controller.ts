@@ -3,8 +3,6 @@ import {
   Controller,
   Post,
   Get,
-  Param,
-  ParseIntPipe,
   Query,
   Req,
   UseGuards,
@@ -18,9 +16,7 @@ import {
 import { GatewayService } from './gateway.service';
 import { RegisterGatewayDto } from './dto/register-gateway.dto';
 import { LoginGatewayDto } from './dto/login-gateway.dto';
-import { CreatePixDto } from './dto/create-pix.dto';
 import { CreateWebhookDto } from './dto/create-webhook.dto';
-import { CreateCardPaymentDto } from './dto/create-card-payment.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @ApiTags('Gateway')
@@ -44,27 +40,17 @@ export class GatewayController {
     return this.gatewayService.login(loginGatewayDto);
   }
 
-  @Post('pix/:userId')
-  createPix(
-    @Param('userId', ParseIntPipe) userId: number,
-    @Body() createPixDto: CreatePixDto,
-  ) {
-    return this.gatewayService.createPix(
-      userId,
-      createPixDto,
-    );
-  }
-
-  @Post('webhooks/:userId')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Post('webhooks')
   createWebhook(
-    @Param('userId', ParseIntPipe)
-    userId: number,
+    @Req() req: any,
 
     @Body()
     createWebhookDto: CreateWebhookDto,
   ) {
     return this.gatewayService.createWebhook(
-      userId,
+      req.user.sub,
       createWebhookDto,
     );
   }
@@ -74,21 +60,6 @@ export class GatewayController {
     @Query('brand') brand?: string,
   ) {
     return this.gatewayService.getFees(brand);
-  }
-
-  @Post('card/:userId')
-  createCardPayment(
-    @Param('userId', ParseIntPipe)
-    userId: number,
-
-    @Body()
-    createCardPaymentDto:
-      CreateCardPaymentDto,
-  ) {
-    return this.gatewayService.createCardPayment(
-      userId,
-      createCardPaymentDto,
-    );
   }
 
   @ApiBearerAuth()
@@ -102,6 +73,7 @@ export class GatewayController {
     );
   }
 
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Get('transactions')
   getAuthenticatedTransactions(
