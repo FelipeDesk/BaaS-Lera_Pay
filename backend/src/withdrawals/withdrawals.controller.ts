@@ -8,10 +8,16 @@ import {
   UseGuards
 } from '@nestjs/common';
 
+import {
+  ApiBearerAuth,
+  ApiTags,
+} from '@nestjs/swagger';
+
 import { WithdrawalsService } from './withdrawals.service';
 import { CreateWithdrawalDto } from './dto/create-withdrawal.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
+@ApiTags('Withdrawals')
 @Controller('withdrawals')
 export class WithdrawalsController {
   constructor(
@@ -19,20 +25,7 @@ export class WithdrawalsController {
       WithdrawalsService,
   ) {}
 
-  @Post(':userId')
-  create(
-    @Param('userId', ParseIntPipe)
-    userId: number,
-
-    @Body()
-    createWithdrawalDto: CreateWithdrawalDto,
-  ) {
-    return this.withdrawalsService.create(
-      userId,
-      createWithdrawalDto,
-    );
-  }
-
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
     @Post()
     createAuthenticated(

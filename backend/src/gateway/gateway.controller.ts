@@ -10,6 +10,11 @@ import {
   UseGuards,
 } from '@nestjs/common';
 
+import {
+  ApiBearerAuth,
+  ApiTags,
+} from '@nestjs/swagger';
+
 import { GatewayService } from './gateway.service';
 import { RegisterGatewayDto } from './dto/register-gateway.dto';
 import { LoginGatewayDto } from './dto/login-gateway.dto';
@@ -18,6 +23,7 @@ import { CreateWebhookDto } from './dto/create-webhook.dto';
 import { CreateCardPaymentDto } from './dto/create-card-payment.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
+@ApiTags('Gateway')
 @Controller('gateway')
 export class GatewayController {
   constructor(
@@ -38,28 +44,6 @@ export class GatewayController {
         return this.gatewayService.login(loginGatewayDto);
     }
 
-  @Get('wallet/:userId')
-    getWallet(
-        @Param('userId', ParseIntPipe) userId: number,
-    ) {
-        return this.gatewayService.getWallet(userId);
-    }
-
-  @Get('transactions/:userId')
-    getTransactions(
-        @Param('userId', ParseIntPipe) userId: number,
-        @Query('status') status?: string,
-        @Query('type') type?: string,
-        @Query('limit') limit?: string,
-    ) {
-        return this.gatewayService.getTransactions(
-            userId,
-            status,
-            type,
-            limit ? Number(limit) : undefined,
-        );
-    }
-   
   @Post('pix/:userId')
     createPix(
         @Param('userId', ParseIntPipe) userId: number,
@@ -107,6 +91,7 @@ export class GatewayController {
         );
     }
 
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
     @Get('wallet')
     getAuthenticatedWallet(

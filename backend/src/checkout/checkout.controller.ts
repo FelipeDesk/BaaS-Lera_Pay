@@ -8,27 +8,22 @@ import {
   UseGuards,
 } from '@nestjs/common';
 
+import {
+  ApiBearerAuth,
+  ApiTags,
+} from '@nestjs/swagger';
+
 import { CheckoutService } from './checkout.service';
 import { CreateCheckoutDto } from './dto/create-checkout.dto';
 import { CreateCardPaymentDto } from '../gateway/dto/create-card-payment.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
+@ApiTags('Checkout')
 @Controller('checkout-links')
 export class CheckoutController {
   constructor(
     private readonly checkoutService: CheckoutService,
   ) {}
-
-  @Post(':userId')
-  create(
-    @Param('userId', ParseIntPipe) userId: number,
-    @Body() createCheckoutDto: CreateCheckoutDto,
-  ) {
-    return this.checkoutService.create(
-      userId,
-      createCheckoutDto,
-    );
-  }
 
   @Post(':checkoutId/pix')
   payWithPix(

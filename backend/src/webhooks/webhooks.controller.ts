@@ -6,10 +6,12 @@ import {
   Req,
 } from '@nestjs/common';
 
-import { Request } from 'express';
+import { ApiTags } from '@nestjs/swagger';
 
+import { Request } from 'express';
 import { WebhooksService } from './webhooks.service';
 
+@ApiTags('Webhooks')
 @Controller('webhooks/lera-box')
 export class WebhooksController {
   constructor(
