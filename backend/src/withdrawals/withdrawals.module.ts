@@ -7,12 +7,14 @@ import { Withdrawal } from './entities/withdrawal.entity';
 
 import { UsersModule } from '../users/users.module';
 import { GatewayModule } from '../gateway/gateway.module';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Withdrawal]),
     UsersModule,
     GatewayModule,
+    AuthModule,
   ],
   controllers: [WithdrawalsController],
   providers: [WithdrawalsService],

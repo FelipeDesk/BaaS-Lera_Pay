@@ -5,7 +5,9 @@ import {
   Get,
   Param,
   ParseIntPipe,
-  Query
+  Query,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 
 import { GatewayService } from './gateway.service';
@@ -14,6 +16,7 @@ import { LoginGatewayDto } from './dto/login-gateway.dto';
 import { CreatePixDto } from './dto/create-pix.dto';
 import { CreateWebhookDto } from './dto/create-webhook.dto';
 import { CreateCardPaymentDto } from './dto/create-card-payment.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('gateway')
 export class GatewayController {
@@ -101,6 +104,32 @@ export class GatewayController {
         return this.gatewayService.createCardPayment(
             userId,
             createCardPaymentDto,
+        );
+    }
+
+  @UseGuards(JwtAuthGuard)
+    @Get('wallet')
+    getAuthenticatedWallet(
+        @Req() req: any,
+    ) {
+        return this.gatewayService.getWallet(
+            req.user.sub,
+        );
+    }
+
+  @UseGuards(JwtAuthGuard)
+    @Get('transactions')
+    getAuthenticatedTransactions(
+        @Req() req: any,
+        @Query('status') status?: string,
+        @Query('type') type?: string,
+        @Query('limit') limit?: string,
+    ) {
+        return this.gatewayService.getTransactions(
+            req.user.sub,
+            status,
+            type,
+            limit ? Number(limit) : undefined,
         );
     }
 }

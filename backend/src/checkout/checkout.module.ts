@@ -8,6 +8,7 @@ import { UsersModule } from '../users/users.module';
 import { GatewayModule } from '../gateway/gateway.module';
 import { OrdersModule } from '../orders/orders.module';
 import { TransactionsModule } from '../transactions/transactions.module';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { TransactionsModule } from '../transactions/transactions.module';
     GatewayModule,
     OrdersModule,
     TransactionsModule,
+    AuthModule,
   ],
   controllers: [CheckoutController],
   providers: [CheckoutService],

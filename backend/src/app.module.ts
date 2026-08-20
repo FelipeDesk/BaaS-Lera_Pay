@@ -11,6 +11,7 @@ import { OrdersModule } from './orders/orders.module';
 import { TransactionsModule } from './transactions/transactions.module';
 import { WebhooksModule } from './webhooks/webhooks.module';
 import { WithdrawalsModule } from './withdrawals/withdrawals.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { WithdrawalsModule } from './withdrawals/withdrawals.module';
     TransactionsModule,
     WebhooksModule,
     WithdrawalsModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

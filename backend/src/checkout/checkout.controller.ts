@@ -4,11 +4,14 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 
 import { CheckoutService } from './checkout.service';
 import { CreateCheckoutDto } from './dto/create-checkout.dto';
 import { CreateCardPaymentDto } from '../gateway/dto/create-card-payment.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('checkout-links')
 export class CheckoutController {
@@ -52,6 +55,18 @@ export class CheckoutController {
     return this.checkoutService.payWithCard(
       checkoutId,
       cardData,
+    );
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post()
+  createAuthenticated(
+    @Req() req: any,
+    @Body() createCheckoutDto: CreateCheckoutDto,
+  ) {
+    return this.checkoutService.create(
+      req.user.sub,
+      createCheckoutDto,
     );
   }
 }
