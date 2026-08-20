@@ -41,4 +41,17 @@ export class WebhooksController {
       signature,
     );
   }
+
+  @Post('withdrawal')
+  handleWithdrawal(
+    @Req() req: Request & { rawBody?: Buffer },
+    @Headers('x-lera-box-signature')
+    signature?: string,
+  ) {
+    return this.webhooksService.processWithdrawal(
+      req.body,
+      req.rawBody,
+      signature,
+    );
+  }
 }

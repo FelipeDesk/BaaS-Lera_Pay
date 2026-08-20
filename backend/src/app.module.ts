@@ -10,6 +10,7 @@ import { CheckoutModule } from './checkout/checkout.module';
 import { OrdersModule } from './orders/orders.module';
 import { TransactionsModule } from './transactions/transactions.module';
 import { WebhooksModule } from './webhooks/webhooks.module';
+import { WithdrawalsModule } from './withdrawals/withdrawals.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { WebhooksModule } from './webhooks/webhooks.module';
     OrdersModule,
     TransactionsModule,
     WebhooksModule,
+    WithdrawalsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

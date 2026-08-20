@@ -367,4 +367,80 @@ export class GatewayService {
 
     return response.data;
   }
+
+  async createWithdrawal(
+    userId: number,
+    data: {
+        amount: number;
+        pixKey: string;
+        description: string;
+        externalReference: string;
+        document: string;
+    },
+    ) {
+    const gatewayAccount =
+        await this.gatewayAccountRepository.findOne({
+        where: {
+            user: {
+            id: userId,
+            },
+        },
+        relations: {
+            user: true,
+        },
+        });
+
+    if (!gatewayAccount) {
+        throw new UnauthorizedException(
+        'Conta do gateway não encontrada para este usuário',
+        );
+    }
+
+    const response =
+        await this.httpService.axiosRef.post(
+        `${this.baseUrl}/withdrawals`,
+        data,
+        {
+            headers: {
+            Authorization:
+                `Bearer ${gatewayAccount.accessToken}`,
+            },
+        },
+        );
+
+    return response.data;
+  }
+
+  async getWithdrawal(
+    userId: number,
+    withdrawalId: string,
+    ) {
+    const gatewayAccount =
+        await this.gatewayAccountRepository.findOne({
+        where: {
+            user: {
+            id: userId,
+            },
+        },
+        });
+
+    if (!gatewayAccount) {
+        throw new UnauthorizedException(
+        'Conta do gateway não encontrada',
+        );
+    }
+
+    const response =
+        await this.httpService.axiosRef.get(
+        `${this.baseUrl}/withdrawals/${withdrawalId}`,
+        {
+            headers: {
+            Authorization:
+                `Bearer ${gatewayAccount.accessToken}`,
+            },
+        },
+        );
+
+    return response.data;
+  }
 }

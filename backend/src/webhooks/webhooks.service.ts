@@ -8,6 +8,7 @@ import { WebhookEvent } from './entities/webhook-event.entity';
 import { OrdersService } from '../orders/orders.service';
 import { TransactionsService } from '../transactions/transactions.service';
 import { CheckoutService } from '../checkout/checkout.service';
+import { WithdrawalsService } from '../withdrawals/withdrawals.service';
 
 @Injectable()
 export class WebhooksService {
@@ -19,6 +20,7 @@ export class WebhooksService {
     private readonly transactionsService: TransactionsService,
     private readonly checkoutService: CheckoutService,
     private readonly configService: ConfigService,
+    private readonly withdrawalsService: WithdrawalsService,
   ) {}
 
   private validateSignature(
@@ -228,5 +230,105 @@ export class WebhooksService {
       rawBody,
       signature,
     );
+  }
+
+  async processWithdrawal(
+    payload: any,
+    rawBody: Buffer | undefined,
+    signature?: string,
+  ) {
+    const signatureValid =
+      this.validateSignature(
+        rawBody,
+        signature,
+      );
+
+    if (!signatureValid) {
+      throw new UnauthorizedException(
+        'Assinatura do webhook inválida',
+      );
+    }
+
+    const {
+      event,
+      status,
+      transactionId,
+      externalReference,
+    } = payload;
+
+    if (
+      event !== 'WITHDRAWAL' ||
+      !transactionId ||
+      !externalReference
+    ) {
+      return {
+        received: false,
+        message: 'Payload de webhook inválido',
+      };
+    }
+
+    const existingEvent =
+      await this.findExistingEvent(
+        transactionId,
+      );
+
+    if (existingEvent) {
+      return {
+        received: true,
+        duplicated: true,
+      };
+    }
+
+    const webhookEvent =
+      this.webhookRepository.create({
+        eventType: event,
+        externalEventId: transactionId,
+        payload,
+        processed: false,
+      });
+
+    await this.webhookRepository.save(
+      webhookEvent,
+    );
+
+    const withdrawal =
+      await this.withdrawalsService.findByExternalReference(
+        externalReference,
+      );
+
+    const validStatuses = [
+      'PENDING',
+      'APPROVED',
+      'DENIED',
+      'EXPIRED',
+      'CANCELLED',
+    ] as const;
+
+    if (
+      withdrawal &&
+      validStatuses.includes(
+        status as typeof validStatuses[number],
+      )
+    ) {
+      await this.withdrawalsService.updateStatus(
+        withdrawal,
+        status,
+      );
+    }
+
+    webhookEvent.processed = true;
+
+    await this.webhookRepository.save(
+      webhookEvent,
+    );
+
+    console.log(
+      `Webhook WITHDRAWAL processado: ${externalReference} - ${status}`,
+    );
+
+    return {
+      received: true,
+      processed: true,
+    };
   }
 }
