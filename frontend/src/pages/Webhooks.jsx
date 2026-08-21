@@ -79,7 +79,7 @@ function Webhooks() {
             onChange={(e) =>
               setUrl(e.target.value)
             }
-            placeholder="https://seu-dominio.com/webhooks/lera-box/pix"
+            placeholder="https://baas-lerapay-production.up.railway.app/webhooks/lera-box/pix"
             required
           />
         </div>
