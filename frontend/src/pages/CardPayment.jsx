@@ -156,7 +156,7 @@ function CardPayment() {
           </div>
 
           <div className="form-group">
-            <label>Mês</label>
+            <label>Mês de Validade</label>
 
             <input
               className="input"
@@ -174,7 +174,7 @@ function CardPayment() {
           </div>
 
           <div className="form-group">
-            <label>Ano</label>
+            <label>Ano de Validade</label>
 
             <input
               className="input"

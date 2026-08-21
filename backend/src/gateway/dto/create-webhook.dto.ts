@@ -1,15 +1,8 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsIn,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
   IsUrl,
 } from 'class-validator';
-
-import {
-  ApiProperty,
-  ApiPropertyOptional,
-} from '@nestjs/swagger';
 
 export class CreateWebhookDto {
   @ApiProperty({
@@ -32,15 +25,8 @@ export class CreateWebhookDto {
 
   @ApiProperty({
     example:
-      'https://seu-dominio.com/webhooks/lera-box/pix',
+      'https://baas-lerapay-production.up.railway.app/webhooks/lera-box/pix',
   })
   @IsUrl()
   url: string;
-
-  @ApiPropertyOptional({
-    example: 'meu-segredo-webhook',
-  })
-  @IsOptional()
-  @IsString()
-  secret?: string;
 }

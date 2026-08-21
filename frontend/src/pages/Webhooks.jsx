@@ -6,7 +6,6 @@ function Webhooks() {
 
   const [event, setEvent] = useState('PAYMENT_PIX');
   const [url, setUrl] = useState('');
-  const [secret, setSecret] = useState('');
 
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
@@ -25,7 +24,6 @@ function Webhooks() {
         {
           event,
           url,
-          secret,
         },
       );
 
@@ -83,20 +81,6 @@ function Webhooks() {
             }
             placeholder="https://seu-dominio.com/webhooks/lera-box/pix"
             required
-          />
-        </div>
-
-        <div className="form-group">
-          <label>Secret</label>
-
-          <input
-            className="input"
-            type="text"
-            value={secret}
-            onChange={(e) =>
-              setSecret(e.target.value)
-            }
-            placeholder="segredo-do-webhook"
           />
         </div>
 

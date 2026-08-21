@@ -240,10 +240,25 @@ export class GatewayService {
       );
     }
 
+    const secret =
+      this.configService.get<string>(
+        'LERA_WEBHOOK_SECRET',
+      );
+
+    if (!secret) {
+      throw new Error(
+        'LERA_WEBHOOK_SECRET não configurado',
+      );
+    }
+
     const response =
       await this.httpService.axiosRef.post(
         `${this.baseUrl}/webhooks`,
-        data,
+        {
+          event: data.event,
+          url: data.url,
+          secret,
+        },
         {
           headers: {
             Authorization:
